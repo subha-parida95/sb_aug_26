@@ -5,7 +5,9 @@ import java.io.PrintWriter;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,10 +46,18 @@ public class HelloController {
     //     return "details-page";
     // }
 
-    @RequestMapping("submit-details")
-    public String submitDetails(@RequestParam(value = "name1") String name12, @RequestParam String phone, Model model){
-        model.addAttribute("name", name12);
-        model.addAttribute("phone", phone);
+    // @RequestMapping(value = "submit-details", method = RequestMethod.POST)
+    // public String submitDetails(@RequestParam(value = "name1", required = false, defaultValue = "Spring boot") String name12, @RequestParam String phone, Model model){
+    //     model.addAttribute("name", name12);
+    //     model.addAttribute("phone", phone);
+
+    //     return "details-page";
+    // }
+
+    @RequestMapping(value = "submit-details", method = RequestMethod.POST)
+    public String submitDetails(@ModelAttribute Person person, Model model){
+        model.addAttribute("name", person.getname1());
+        model.addAttribute("phone", person.getPhone());
 
         return "details-page";
     }

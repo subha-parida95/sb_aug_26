@@ -2,71 +2,56 @@ package com.jt.expense_tracker;
 
 import java.util.List;
 
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 
 @RestController
 @RequiredArgsConstructor
 public class ExepnseController {
-    private final JdbcTemplate jdbcTemplate;
-    private static final String EXPENSES_TABLE = "expenses";
+    private final ExpenseService expenseService;
     
-
+    
     @GetMapping("/expenses")
-    public String getMethodName(@RequestParam String param) {
-        return param;
-    }
-    
     public List<Expense> getExpenses(){
-        String sql = "SELECT * FROM %s".formatted(EXPENSES_TABLE);
-
-        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<Expense>(Expense.class));
+        
+        return expenseService.getExpenses();
     }
 
     
     @GetMapping("/expenses/{id}")
     public Expense getExpenseById(@PathVariable int id){
-        System.out.println("Id is " + id);
-        var sql = "SELECT * FROM %s WHERE id=?".formatted(EXPENSES_TABLE);
-        Expense expense = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(Expense.class), id);
-        return expense;
+
+        return expenseService.getExpenseById(id);
     }
 
     @PostMapping("/expenses")
+    @ResponseStatus(code = HttpStatus.CREATED)
     public Expense createExpense(@RequestBody Expense expense){ // RequestBody anotation is uses to convert jason data to java object
-        var sql = "INSERT INTO %s (title, category, price, date) values(?,?,?,?)".formatted(EXPENSES_TABLE);
-        jdbcTemplate.update(sql, expense.getTitle(), expense.getCategory(), expense.getPrice(), expense.getDate());
-        return expense;
+        return expenseService.addExpense(expense);
     }    
 
    @DeleteMapping("/expenses/{id}") // Line number 76 and 77 meaning same
+   @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void deleteExpense(@PathVariable int id){
-        String sql = "DELETE FROM %s WHERE id =?".formatted(EXPENSES_TABLE);
-        jdbcTemplate.update(sql, id);
+         getExpenseById(id);
+        expenseService.deleteExpenseById(id);
     }
 
     @PutMapping("/expenses")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public Expense updateExpense(@RequestBody Expense expense){
-        var sql = "UPDATE %s SET title=?, category=?, price=?, date=? WHERE id=?".formatted(EXPENSES_TABLE);
-        jdbcTemplate.update(sql, expense.getTitle(), expense.getCategory(), expense.getPrice(), expense.getDate(), expense.getId());
         
-        return getExpenseById(expense.getId());
+        getExpenseById(expense.getId());
+        return expenseService.updatExpense(expense);
     }
 }
-
-
-
-// schema.sql -> Table Structure
-// data.sql -> put rows inside the table

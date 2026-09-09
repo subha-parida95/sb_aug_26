@@ -20,13 +20,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class ExepnseController {
     private final ExpenseService expenseService;
     
-    
     @GetMapping("/expenses")
     public List<Expense> getExpenses(){
         
         return expenseService.getExpenses();
     }
-
     
     @GetMapping("/expenses/{id}")
     public Expense getExpenseById(@PathVariable int id){

@@ -2,15 +2,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const ExpenseList = () => {
+const ExpenseList = ({expenses}) => {
 
-    const [expenses, setExpenses] = useState([]);
-
-    useEffect(() => {
-        getExpenses();
-    }, []);
-     
     const handelDelete =async (expensesId)=>{
+        if(confirm("Are you sure want to delete the expense ?"))
         try{
             const response = await axios.delete('http://localhost:8080/expenses/'+expensesId)
             if(response.status===204){
@@ -25,16 +20,6 @@ const ExpenseList = () => {
         
     }
 
-    const getExpenses = async () => {
-        try {
-
-            const response = await axios.get("http://localhost:8080/expenses");
-            console.log("data is:", response.data);
-            setExpenses(response.data);
-             } catch (err) {
-            console.log("error is:", err);
-                 }
-    };
      return (
         <div className="bg-white rounded-2xl shadow-md p-6">
 
@@ -58,7 +43,11 @@ const ExpenseList = () => {
                 </thead>
 
                 <tbody>
-                    {expenses.map((expense, index) => (
+                    { !expenses.length ?
+                        <tr><td colSpan={6} className="text-center text-gray-400 py-2 text-lg font-medium italic">
+                            No Expenses recorded yet.</td></tr>:
+                    
+                    expenses.map((expense, index) => (
                          <tr key={expense.id}className="border-b border-gray-200 hover:bg-gray-50">
                             <td className="px-4 py-3">
                                 {index + 1}

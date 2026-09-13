@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const ExpenseList = ({expenses}) => {
+const ExpenseList = ({expenses ,getExpenses}) => {
 
     const handelDelete =async (expensesId)=>{
         if(confirm("Are you sure want to delete the expense ?"))
@@ -11,11 +11,11 @@ const ExpenseList = ({expenses}) => {
             if(response.status===204){
                 getExpenses();
             }else{
-                console.log("something went wrong")
+                alert("something went wrong")
             }
 
         }catch(err){
-
+            console.log("something error occured.", err)
         };
         
     }

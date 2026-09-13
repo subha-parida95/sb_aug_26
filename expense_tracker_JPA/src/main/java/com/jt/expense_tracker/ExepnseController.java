@@ -43,7 +43,7 @@ public class ExepnseController {
    @DeleteMapping("/expenses/{id}") // Line number 76 and 77 meaning same
    @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void deleteExpense(@PathVariable int id){
-         getExpenseById(id);
+        getExpenseById(id);
         expenseService.deleteExpenseById(id);
     }
 

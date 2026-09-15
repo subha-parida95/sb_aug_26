@@ -1,11 +1,26 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import expenseService from "../Services/expenseService";
 
-const ExpenceForm  = ({getExpenses})=>{
+const ExpenceForm  = ({getExpenses, editingExpense, setEditingExpense})=>{
     const [title, setTitle] = useState('')
     const [category, setCategory] = useState('')
     const [price, setPrice] = useState('')
     const [date, setDate] = useState('')
+    const [errors, setErrors] = useState({})
+
+    useEffect(() =>{
+        if(editingExpense){
+            setErrors({})
+
+            setTitle(editingExpense.title)
+            setCategory(editingExpense.category)
+            setPrice(editingExpense.price)
+            setDate(editingExpense.date)
+
+            window.scrollTo({top:0, behavior: 'smooth'})
+        }
+    }, [editingExpense])
 
     const handelSubmit = async (e) => {
         e.preventDefault();
@@ -13,18 +28,39 @@ const ExpenceForm  = ({getExpenses})=>{
         if(!validate()) return
 
         const expense = {
-            id: 0,
+            id: editingExpense ? editingExpense.id : 0,
             title,
             price,
             category,
             date
         }
-        await createExpense(expense)        
+
+        if(editingExpense){
+            await updateExpense(expense)
+        }else{
+            await createExpense(expense)        
+        }
+    }
+
+    async function updateExpense(expense) {
+        try{
+            const response = await expenseService.updateExpense(expense);
+
+            if(response.status === 202){
+                getExpenses();
+                clearForm();
+                setEditingExpense(null)
+            }else{
+                alert("Something went wrong !!!")
+            }
+        }catch(err){
+            console.log("Some Error Occured:-", err)
+        }
     }
 
     async function createExpense(expense){
         try{
-            const response = await axios.post("http://localhost:8080/expenses", expense)
+            const response = await expenseService.createExpense(expense);
 
             if(response.status === 201){
                 getExpenses();
@@ -37,7 +73,6 @@ const ExpenceForm  = ({getExpenses})=>{
         }
     }
 
-    const [errors, setErrors] = useState({})
     const validate = () =>{
         const newErrors = {}
 
@@ -106,9 +141,14 @@ const ExpenceForm  = ({getExpenses})=>{
         }
     }
 
+    const handelCancel = (e) => {
+        setEditingExpense(null)
+        clearForm()
+    }
+
     return(
        <div className="bg-white rounded-2xl shadow-md p-6">
-                <h2 className="text-2xl font-semibold text-grey-700 mb-4">Add Expense</h2>
+                <h2 className="text-2xl font-semibold text-grey-700 mb-4">{editingExpense ? 'Edit' : 'Add'} Expense</h2>
 
        <form action={"#"} onSubmit={handelSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* title */}
@@ -172,8 +212,19 @@ const ExpenceForm  = ({getExpenses})=>{
         </div>
         {/* Add button expense button */}
         <div className="mt-5">
-            <button className="bg-green-600 hover:bg-green-700 px-6 py-4 rounded-lg font-medium transition-colors duration-200">
-                Add Exense</button>
+            {
+                editingExpense ? 
+                <div className="flex gap-2">
+                    <button className="bg-green-600 hover:bg-green-700 px-6 py-4 rounded-lg font-medium transition-colors duration-200">
+                    Updatae Expense</button>
+
+                    <button onClick={handelCancel} className="bg-yellow-600 hover:bg-yellow-700 px-6 py-4 rounded-lg font-medium transition-colors duration-200">
+                    Cancel</button>
+                </div>:
+    
+                <button className="bg-green-600 hover:bg-green-700 px-6 py-4 rounded-lg font-medium transition-colors duration-200">
+                    Add Exense</button>
+            }
         </div>
 
        </form>

@@ -1,13 +1,14 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import expenseService from "../Services/expenseService";
 
-const ExpenseList = ({expenses ,getExpenses}) => {
+const ExpenseList = ({expenses ,getExpenses, setEditingExpense}) => {
 
     const handelDelete =async (expensesId)=>{
         if(confirm("Are you sure want to delete the expense ?"))
         try{
-            const response = await axios.delete('http://localhost:8080/expenses/'+expensesId)
+            const response = await expenseService.deleteExpense(expensesId)
             if(response.status===204){
                 getExpenses();
             }else{
@@ -18,6 +19,10 @@ const ExpenseList = ({expenses ,getExpenses}) => {
             console.log("something error occured.", err)
         };
         
+    }
+
+    function handelEdit(expense){
+        setEditingExpense(expense)
     }
 
      return (
@@ -71,7 +76,7 @@ const ExpenseList = ({expenses ,getExpenses}) => {
                                 <div className="flex gap-2">
 
                                     <button
-                                        className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1.5 rounded-lg">
+                                        onClick={() => handelEdit(expense)} className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1.5 rounded-lg">
                                     
                                         Edit
                                     </button>

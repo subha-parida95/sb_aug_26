@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -19,35 +20,36 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin("http://localhost:5173")
+@RequestMapping ("/expenses")
 public class ExepnseController {
     private final ExpenseService expenseService;
     
-    @GetMapping("/expenses")
+    @GetMapping
     public List<Expense> getExpenses(){
         
         return expenseService.getExpenses();
     }
     
-    @GetMapping("/expenses/{id}")
+    @GetMapping("/{id}")
     public Expense getExpenseById(@PathVariable int id){
 
         return expenseService.getExpenseById(id);
     }
 
-    @PostMapping("/expenses")
+    @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     public Expense createExpense(@RequestBody Expense expense){ // RequestBody anotation is uses to convert jason data to java object
         return expenseService.addExpense(expense);
     }    
 
-   @DeleteMapping("/expenses/{id}") // Line number 76 and 77 meaning same
+   @DeleteMapping("/{id}") // Line number 76 and 77 meaning same
    @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void deleteExpense(@PathVariable int id){
         getExpenseById(id);
         expenseService.deleteExpenseById(id);
     }
 
-    @PutMapping("/expenses")
+    @PutMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Expense updateExpense(@RequestBody Expense expense){
         
